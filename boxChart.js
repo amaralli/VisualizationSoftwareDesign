@@ -2,8 +2,6 @@ window.BoxChart = (function() {
 
 	//constructs the box chart object, with no arguments
 	var myChart = function() {
-		//original chart object
-		var chart = {};
 
 		//////////////////////////////////
 		/****DEFAULTS AND VALUES*********/
@@ -28,7 +26,7 @@ window.BoxChart = (function() {
 		//as the user changes height and width, these may
 		//change. 600 and 1000 are the default bounds
 		var heightBound = 600;
-		var widthBound = 1000;
+		var widthBound = 400;
 
 		//the x-value and y-values for the data set 
 		var xVar;
@@ -63,10 +61,10 @@ window.BoxChart = (function() {
 
 		//generates the box and whisker plot
 		function makeChart(selection) {
-			selection.each(function(data) {
-				console.log(data);
-
-				var svg = d3.select(selection)
+			selection.each(function(data1) {
+				data = data1[0];
+			
+				var svg = d3.select(this)
 						.append('svg')
 						.attr('height', heightBound)
 						.attr('width', widthBound);
@@ -108,21 +106,34 @@ window.BoxChart = (function() {
 			   	//determines scale for axis and all points, and finds
 			   	//quartile data
 			    var scale = function() {
-					// var xVals = data.map(function(d) {
-					// 	return d[xVar];
-					// });
 
-					xScale = d3.scale.ordinal().rangeBands([0, width], .1).domain(xVar);
+					xScale = d3.scale.ordinal().rangeBands([0, width], .1).domain([xVar]);
 
 					boxChartMin = d3.min(data, function(d) {return +d[yVar]});
 
 					boxChartMax = d3.max(data, function(d) {return +d[yVar]});
 
-					boxChartQ1 = d3.quantile(data, .25);
+					var yVals = data.map(function(d) {
+						return +d[yVar];
+					})
 
-					boxChartMedian = d3.quantile(data, .5);
+					function compareNumbers(a, b)
+					{
+						return a - b;
+					}
 
-					boxChartQ3 = d3.quantile(data, .75);
+					yVals.sort(compareNumbers);
+
+					console.log(yVals);
+
+					boxChartQ1 = d3.quantile(yVals, .25);
+					console.log(boxChartQ1);
+
+					boxChartMedian = d3.quantile(yVals, .5);
+					console.log(boxChartMedian);
+
+					boxChartQ3 = d3.quantile(yVals, .75);
+					console.log(boxChartQ3);
 
 					yScale = d3.scale.linear().range([height, 0]).domain([0, boxChartMax]);
 				}
@@ -142,7 +153,7 @@ window.BoxChart = (function() {
 			    	yAxisLabel.transition().duration(transitionTime).call(yAxis);
 
 
-			    	xAxisText.text(xVar);
+			    	//xAxisText.text(xVar);
 			    	yAxisText.text(yVar);
 				}
 
@@ -157,33 +168,20 @@ window.BoxChart = (function() {
 					/////////////////////////////////////////
 
 				    rect.append('rect')
-				    	.attr('x', function(d) {
-				    		return margin.left + xScale(xVar);
-				    	})
-				    	.attr('y', 0)
-				    	.attr('height', 0)
-				    	.attr('width', xScale.rangeBand())
-				    	.attr('title', function(d) {
-				    		return xVar;
-				    	})
-				    	.style('fill', color);
-
-			    	rect.transition()
-			    		.duration(transitionTime)
-			    		.delay(function(d, i) {
-			    			return i * 50;
-			    		})
 			    		.attr('x', function(d) {
 			    			return margin.left + xScale(xVar);
 			    		})
 			    		.attr('y', function(d) {
-			    			return margin.top + yScale(boxChartQ3, 10)
+			    			return margin.top + yScale(boxChartQ3)
 			    		})
 			    		.attr('height', function(d) {
-			    			return height - yScale(boxChartQ3 - boxChartQ1, 10)
+			    			console.log("Q3 " + yScale(boxChartQ3));
+			    			console.log("Q1 " + yScale(boxChartQ1));
+			    			return yScale(boxChartQ1) - yScale(boxChartQ3)
 			    		})
 			    		.attr('width', xScale.rangeBand())
-			    		.attr('title', function(d) {return xVar})
+			    		.attr('stroke-width', 2)
+			    		.attr('stroke', 'black')
 			    		.style('fill', color);
 
 					/////////////////////////////////////////
@@ -195,7 +193,7 @@ window.BoxChart = (function() {
 						    	.attr('cx', function(d) {
 						    		return margin.left + xScale(xVar) + (0.5 * xScale.rangeBand());
 						    	})
-						    	.attr('cy', margin.top + yScale(boxChartMax, 10))
+						    	.attr('cy', margin.top + yScale(boxChartMax))
 						    	.attr('r', pointRadius)
 						    	.style('fill', '#000000');
 
@@ -203,7 +201,7 @@ window.BoxChart = (function() {
 						    	.attr('cx', function(d) {
 						    		return margin.left + xScale(xVar) + (0.5 * xScale.rangeBand());
 						    	})
-						    	.attr('cy', margin.top + yScale(boxChartMin, 10))
+						    	.attr('cy', margin.top + yScale(boxChartMin))
 						    	.attr('r', pointRadius)
 						    	.style('fill', '#000000');
 				    } else {
@@ -211,11 +209,11 @@ window.BoxChart = (function() {
 					    	.attr('x1', function(d) {
 	    						return margin.left + xScale(xVar);
 			    			})
-							.attr('y1', margin.top + yScale(boxChartMin, 10))
+							.attr('y1', margin.top + yScale(+boxChartMin))
 							.attr('x2', function(d) {
 					    		return margin.left + xScale(xVar) + xScale.rangeBand();
 					    	})
-							.attr('y2', margin.top + yScale(boxChartMin, 10))
+							.attr('y2', margin.top + yScale(+boxChartMin))
 							.attr('stroke-width', 2)
 							.attr('stroke', 'black');
 
@@ -223,11 +221,11 @@ window.BoxChart = (function() {
 					    	.attr('x1', function(d) {
 	    						return margin.left + xScale(xVar);
 			    			})
-							.attr('y1', margin.top + yScale(boxChartMax, 10))
+							.attr('y1', margin.top + yScale(+boxChartMax))
 							.attr('x2', function(d) {
 					    		return margin.left + xScale(xVar) + xScale.rangeBand();
 					    	})
-							.attr('y2', margin.top + yScale(boxChartMax, 10))
+							.attr('y2', margin.top + yScale(+boxChartMax))
 							.attr('stroke-width', 2)
 							.attr('stroke', 'black');
 				    }
@@ -256,11 +254,11 @@ window.BoxChart = (function() {
 						.attr('x1', function(d) {
 				    		return margin.left + xScale(xVar);
 				    	})
-						.attr('y1', margin.top + yScale(boxChartMedian, 10))
+						.attr('y1', margin.top + yScale(boxChartMedian))
 						.attr('x2', function(d) {
 				    		return margin.left + xScale(xVar) + xScale.rangeBand();
 						})
-						.attr('y2', margin.top + yScale(boxChartMedian, 10))
+						.attr('y2', margin.top + yScale(boxChartMedian))
 						.attr('stroke-width', 2)
 						.attr('stroke', 'black');
 
@@ -281,28 +279,30 @@ window.BoxChart = (function() {
 		//////////////////////////////////
 
 		//sets or returns the width of the box chart
-		chart.width = function(n) {
+		makeChart.width = function(n) {
 			if(!arguments.length) return widthBound;
 			widthBound = n;
+			width = widthBound - margin.bottom - margin.top;
 			return this;
 		}
 
 		//sets or returns the height of the box chart
-		chart.height = function(n) {
+		makeChart.height = function(n) {
 			if(!arguments.length) return heightBound;
 			heightBound = n;
+			height = heightBound - margin.bottom - margin.top;
 			return this;
 		}
 
 		//sets or returns the color of the box chart
-		chart.color = function(value) {
+		makeChart.color = function(value) {
 			if(!arguments.length) return color;
 			color = value;
 			return this;
 		}
 
 		//allows user to choose lines instead of dots for min/max
-		chart.usePoints = function(value) {
+		makeChart.usePoints = function(value) {
 			if(!arguments.length) return pointMarkers;
 			if(typeof pointMarkers === 'boolean') {
 				pointMarkers = value;
@@ -311,21 +311,21 @@ window.BoxChart = (function() {
 		}
 
 		//allows user to set yVariable to parse through the data
-		chart.yVariable = function(value) {
+		makeChart.yVariable = function(value) {
 			if(!arguments.length) return yVar;
 			yVar = value;
 			return this;
 		}
 
 		//allows user to set x-axis label to parse through the data
-		chart.xAxis = function(value) {
+		makeChart.xAxis = function(value) {
 			if(!arguments.length) return xVar;
 			xVar = value;
 			return this;
 		}
 
 		//returns the chart after defaults are set
-		return chart;
+		return makeChart;
 
 	};
 
