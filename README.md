@@ -19,27 +19,27 @@ Below is a list of the functions you can call. Further down, you will see instru
 
 + You can change the **width**- but it will default to 400
 
-  *`boxChart.width(value)`
+  * `boxChart.width(value)`
 
 + You can change the **height**- but it will default to 600
 
-  *`boxChart.height(value)`
+  * `boxChart.height(value)`
 
 + You can change the color of the **box**- but it will default to a teal color. This can take in any Javascript color- "black", "#000000", and "rgb(256, 256, 256)" are all acceptable.
 
-  *`boxChart.color(value)`
+  * `boxChart.color(value)`
 
 + You can change whether or not the maximums or minimums will be **represented with lines or dots**- but it will default to dots. Passing in _true_ will give you dots, passing in _false_ will give you lines.
 
-  *`boxChart.usePoints(true)`
+  * `boxChart.usePoints(true)`
 
 + You can change the **xAxis title**- it will be empty by default
 
-  *`boxChart.xAxis("Example")`
+  * `boxChart.xAxis("Example")`
 
 + You can change the **y-variable** represented in your box and whisker data. _This must match the format of the variable name in your dataset. If it has a capital letter, it must also have a capital letter, etc_
 
-  *`boxChart.yVariable("Variable Name")`
+  * `boxChart.yVariable("Variable Name")`
 
 You can use, or not use these, however you see fit. Outside of this, we'll worry about the rest!
 
