@@ -50,16 +50,16 @@ Now that you know what you can do with this software, let's look at how you use 
 1.First, save this Javascript file into the folder where the file you will be using is located.
 
 2. After, you need to select the div that you would like to place your SVG and drawing in.
-..* `var selectDiv = d3.select(DIV)`
+  * `var selectDiv = d3.select(DIV)`
 
 3. Then, create your BoxChart object
-..* `var chart = BoxChart()`
+  * `var chart = BoxChart()`
 
 4. Once it's created, feel free to customize however you like with the above list of functions!
-..* `chart.width(200).height(800)`
+  * `chart.width(200).height(800)`
 
 5. Finally, bind your data, and call your BoxChart object, and you'll have your box and whisker chart!
-..* var boxChartWrapper = selectDiv.datum([data]).call(boxChart);`
+  * var boxChartWrapper = selectDiv.datum([data]).call(boxChart);`
 
 #####After this, you have your chart! =)
 
